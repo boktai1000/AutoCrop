@@ -1,0 +1,8 @@
+## Interface: 20501
+## Title: AutoCrop
+## Author: chromienk
+## Notes: Equips Riding Crop and Engineering mote detecting helmet automatically when mounted, also supports legacy riding gear
+## SavedVariablesPerCharacter: AutoCropDB
+## Version: 1.4.1
+
+AutoCrop.lua
