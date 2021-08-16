@@ -1,285 +1,127 @@
-if not AutoCropDB then
-    AutoCropDB = { enabled = true, legacyMode = false, gasHelm = true, button = false, trinketSlot = true, buttonScale = 1.0, updateInterval = 0.2, version = "1.4.1" }
-end
-
-local timer = AutoCropDB.updateInterval
-
-local f = CreateFrame("Frame")
-  f:RegisterEvent('PLAYER_LOGIN')
-  f:RegisterEvent('BAG_UPDATE')
-  f:RegisterEvent('ADDON_LOADED')
-f:SetScript("OnUpdate", function(self, elapsed)
-  timer = timer - elapsed
-  if(timer > 0) then return end
-  if(not AutoCropDB.enabled or InCombatLockdown() or UnitIsDeadOrGhost("player")) then return end
-  local inInstance, instanceType = IsInInstance()
-  if(IsMounted() and not UnitOnTaxi("player") and (C_SummonInfo.GetSummonConfirmTimeLeft() == 0) and (not inInstance or instanceType == "pvp")) then
-    if(not AutoCropDB.legacyMode) then
-      --crop upper
-      if(not AutoCropDB.trinketSlot) then
-        local itemId = GetInventoryItemID("player", 13)
-        if(itemId) then
-          if(itemId ~= 25653) then
-            AutoCropDB.trinketId = itemId
-            EquipItemByName(25653, 13)
-          end
-        else
-          EquipItemByName(25653, 13)
-        end
-      else
-        --crop lower
-        local itemId = GetInventoryItemID("player", 14)
-        if(itemId) then
-          if(itemId ~= 25653) then
-            AutoCropDB.trinketId = itemId
-            EquipItemByName(25653, 14)
-          end
-        else
-          EquipItemByName(25653, 14)
-        end
-      end
-      --Gas Helmet
-      if(AutoCropDB.gasHelm and not IsResting() and instanceType ~= "pvp") then
-        local itemId2 = GetInventoryItemID("player", 1)
-        if(itemId2) then
-          if(itemId2 ~= 23762) then
-          AutoCropDB.gasHelmId = itemId2
-          EquipItemByName(23762, 1)
-          end
-        else
-          EquipItemByName(23762, 1)
-        end
-      end
-      if(IsResting() or instanceType == "pvp") then
-        if(AutoCropDB.gasHelm) then
-          local itemId2 = GetInventoryItemID("player", 1)
-          if(itemId2 and AutoCropDB.gasHelm) then
-            if(itemId2 ~= 23762) then
-              AutoCropDB.gasHelmId = itemId2
-            elseif(AutoCropDB.gasHelmId) then
-              EquipItemByName(AutoCropDB.gasHelmId, 1)
-            end
-          end
-        end
-      end
-    else
-      --carrot upper
-      if(not AutoCropDB.trinketSlot) then
-        local itemId = GetInventoryItemID("player", 13)
-        if(itemId) then
-          if(itemId ~= 11122) then
-            AutoCropDB.trinketId = itemId
-            EquipItemByName(11122, 13)
-          end
-        else
-          EquipItemByName(11122, 13)
-        end
-      else
-        --carrot lower
-        local itemId = GetInventoryItemID("player", 14)
-        if(itemId) then
-          if(itemId ~= 11122) then
-            AutoCropDB.trinketId = itemId
-            EquipItemByName(11122, 14)
-          end
-        else
-          EquipItemByName(11122, 14)
-        end
-      end
-      --riding gear
-      if(AutoCropDB.enchantHandsLink) then
-        itemLink = GetInventoryItemLink("player", 10) -- hands
-        if(itemLink) then
-          local itemId, enchantId = itemLink:match("item:(%d+):(%d*)")
-          if(enchantId ~= "930") then
-            AutoCropDB.handsLink = "item:"..itemId..":"..enchantId..":"
-            EquipItemByName(AutoCropDB.enchantHandsLink, 10)
-          end
-        else
-          AutoCropDB.handsLink = nil
-          EquipItemByName(AutoCropDB.enchantHandsLink, 10)
-        end
-      end
-      if(AutoCropDB.enchantBootsLink) then    
-        itemLink = GetInventoryItemLink("player", 8) -- feet
-        if(itemLink) then
-          local itemId, enchantId = itemLink:match("item:(%d+):(%d*)")
-          if(enchantId ~= "464") then
-            AutoCropDB.bootsLink = "item:"..itemId..":"..enchantId..":"
-            EquipItemByName(AutoCropDB.enchantBootsLink, 8)
-          end
-        else
-          AutoCropDB.bootsLink = nil
-          EquipItemByName(AutoCropDB.enchantBootsLink, 8)
-        end
-      end
-    end
-  else
-    if(not AutoCropDB.legacyMode) then
-      --crop upper
-      if(not AutoCropDB.trinketSlot) then
-        local itemId = GetInventoryItemID("player", 13)
-        if(itemId) then
-          if(itemId ~= 25653) then
-            AutoCropDB.trinketId = itemId
-          elseif(AutoCropDB.trinketId) then
-            EquipItemByName(AutoCropDB.trinketId, 13)
-          end
-        end
-      else
-        --crop lower
-        local itemId = GetInventoryItemID("player", 14)
-        if(itemId) then
-          if(itemId ~= 25653) then
-            AutoCropDB.trinketId = itemId
-          elseif(AutoCropDB.trinketId) then
-            EquipItemByName(AutoCropDB.trinketId, 14)
-          end
-        end
-      end
-      --Gas helmet
-      if(AutoCropDB.gasHelm) then
-        local itemId2 = GetInventoryItemID("player", 1)
-        if(itemId2 and AutoCropDB.gasHelm) then
-          if(itemId2 ~= 23762) then
-            AutoCropDB.gasHelmId = itemId2
-          elseif(AutoCropDB.gasHelmId) then
-            EquipItemByName(AutoCropDB.gasHelmId, 1)
-          end
-        end
-      end
-    else
-      --carrot upper
-      if(not AutoCropDB.trinketSlot) then
-        local itemId = GetInventoryItemID("player", 13)
-        if(itemId) then
-          if(itemId ~= 11122) then
-            AutoCropDB.trinketId = itemId
-          elseif(AutoCropDB.trinketId) then
-            EquipItemByName(AutoCropDB.trinketId, 13)
-          end
-        end
-      else
-        --carrot lower
-        local itemId = GetInventoryItemID("player", 14)
-        if(itemId) then
-          if(itemId ~= 11122) then
-            AutoCropDB.trinketId = itemId
-          elseif(AutoCropDB.trinketId) then
-            EquipItemByName(AutoCropDB.trinketId, 14)
-          end
-        end
-      end
-      --riding gear
-      if(AutoCropDB.enchantHandsLink) then
-        itemLink = GetInventoryItemLink("player", 10) -- hands
-        if(itemLink) then
-          local itemId, enchantId = itemLink:match("item:(%d+):(%d*)")
-          if(enchantId ~= "930") then
-            AutoCropDB.handsLink = "item:"..itemId..":"..enchantId..":"
-          elseif(AutoCropDB.handsLink) then
-            EquipItemByName(AutoCropDB.handsLink, 10)
-          end
-        else
-          AutoCropDB.handsLink = nil
-        end
-      end
-      if(AutoCropDB.enchantBootsLink) then 
-        itemLink = GetInventoryItemLink("player", 8) -- feet
-        if(itemLink) then
-          local itemId, enchantId = itemLink:match("item:(%d+):(%d*)")
-          if(enchantId ~= "464") then
-            AutoCropDB.bootsLink = "item:"..itemId..":"..enchantId..":"
-          elseif(AutoCropDB.bootsLink) then
-            EquipItemByName(AutoCropDB.bootsLink, 8)
-          end
-        else
-          AutoCropDB.bootsLink = nil
-        end
-      end
-    end
-  end
-  timer = timer + AutoCropDB.updateInterval
-end)
---onload
-f:SetScript('OnEvent', function(self, event, ...)
-  if event == 'ADDON_LOADED' then
-    local addon = ...
-    if addon == 'AutoCrop' then
-      AutoCrop_OnLoad()
-    end
-    if(AutoCropDB.enabled == nil) then
-      AutoCropDB.enabled = true
-    end
-    if(AutoCropDB.legacyMode == nil) then
-      AutoCropDB.legacyMode = false
-    end
-    if(AutoCropDB.gasHelm == nil) then
-      AutoCropDB.gasHelm = false
-    end
-    if(AutoCropDB.button == nil) then
-      AutoCropDB.button = false
-    end
-    if(AutoCropDB.trinketSlot == nil) then
-      AutoCropDB.trinketSlot = true
-    end
-    if(AutoCropDB.buttonScale == nil) then
-      AutoCropDB.buttonScale = 1.0
-    end
-    if(AutoCropDB.updateInterval == nil) then
-      AutoCropDB.updateInterval = 0.2
-    end
-    if(AutoCropDB.version == nil) then
-      AutoCropDB.version = "1.4.1"
-    end
-  else
-    for bag = 0, NUM_BAG_SLOTS do
-      for slot = 0, GetContainerNumSlots(bag) do
-        local link = GetContainerItemLink(bag, slot)
-        if(link) then
-          local itemId, enchantId = link:match("item:(%d+):(%d+)")
-          if(enchantId == "930") then -- riding gloves
-            AutoCropDB.enchantHandsLink = "item:"..itemId..":930:"
-          elseif(enchantId == "464") then -- mithril spurs
-            AutoCropDB.enchantBootsLink = "item:"..itemId..":464:"
-          end
-        end
-      end
-    end
-  end
-end)
-
---normal gear
-function AutoCrop_EquipNormalSet()
-  if(InCombatLockdown() or UnitIsDeadOrGhost("player")) then 
-    return 
-  end
-  if(not AutoCropDB.trinketSlot) then
-    if(AutoCropDB.trinketId) then
-      EquipItemByName(AutoCropDB.trinketId, 13)
-    end
-  else
-    if(AutoCropDB.trinketId) then
-      EquipItemByName(AutoCropDB.trinketId, 14)
-    end
-  end
-  if(AutoCropDB.gasHelmId and AutoCropDB.gasHelm) then
-    EquipItemByName(AutoCropDB.gasHelmId, 1)
-  end
-  if(AutoCropDB.handsLink and AutoCropDB.legacyMode) then
-    EquipItemByName(AutoCropDB.handsLink, 10)
-  end
-  if(AutoCropDB.bootsLink and AutoCropDB.legacyMode) then
-    EquipItemByName(AutoCropDB.bootsLink, 8)
-  end
-end
+AutoCropDB_BACKUP = {
+  enabled = true,
+  pvp = false,
+  gasHelmID = 0,
+  bootsID = 0,
+  golvesID = 0,
+  button = false,
+  trinketSlot = 13,
+  buttonScale = 1.0,
+  legacy = false,
+  vaildGasHelmIDs = {0, 23762, 32479, 32473, 32474, 32495, 32480, 32475, 32472, 32476, 32461, 32494, 32478, 35183, 34356, 34353, 35184, 35181, 34354, 34355, 35185, 35182, 34357, 34847},
+  validGasZones = {"Shadowmoon Valley", "Nagrand", "Zangarmarsh", "Netherstorm"},
+  ignoredList = {},
+  enabledIgnored = false,
+  previousMountState = false,
+  changeWhenExit = false,
+  enteredCombatMounted = false,
+  version = "2.5.1" }
 
 --prints
 function AutoCrop_Print(msg)
-	print("|cfffffcfcAuto|cff00ffffCrop|r: "..(msg or ""))
+  print("|cfffffcfcAuto|cff00ffffCrop|r: "..(msg or ""))
+end
+
+-- Check if item is in an array
+function AutoCrop_InArray(value, myArray)
+  if myArray == nil then
+    return
+  end
+  for _,i in ipairs(myArray) do
+      if value == i then
+          return true
+      end
+  end
+  return false
+end
+
+function AutoCrop_PrintTable(myTable)
+  if myTable == nil then
+    return
+  end
+    for i,v in ipairs(myTable) do
+        print(v)
+    end
+end
+
+function AutoCrop_EquipRidingSet(saveNormal)
+  if saveNormal == nil then
+    saveNormal = true
+  else
+    saveNormal = false
+  end
+
+  if saveNormal then
+    AutoCrop_SaveNormalSet()
+  end
+
+  if AutoCropDB.legacy then
+    EquipItemByName(11122, AutoCropDB.trinketSlot)
+    EquipItemByName(AutoCropDB.bootsID, 8)
+    EquipItemByName(AutoCropDB.glovesID, 10)
+  else
+    EquipItemByName(25653, AutoCropDB.trinketSlot)
+  end
+  if AutoCrop_InArray(GetZoneText(), AutoCropDB.validGasZones) then
+    EquipItemByName(AutoCropDB.gasHelmID, 1)
+  end
+end
+
+function AutoCrop_SaveNormalSet()
+  AutoCropDB.normalHelmID = GetInventoryItemID("player", 1)
+  local itemID = GetInventoryItemID("player", AutoCropDB.trinketSlot)
+  if (not AutoCropDB.legacy and itemID ~= 25653) or (AutoCropDB.legacy and itemID ~= 11122) then
+    AutoCropDB.normalTrinketID = itemID
+  end
+  if AutoCropDB.legacy then
+    local bootsID = GetInventoryItemID("player", 8)
+    local glovesID = GetInventoryItemID("player", 10)
+    if bootsID ~= AutoCropDB.bootsID then
+      AutoCropDB.normalBootsID = bootsID
+    end
+    if glovesID ~= AutoCropDB.glovesID then
+      AutoCropDB.normalGlovesID = glovesID
+    end
+  end
+end
+
+function AutoCrop_EquipNormalSet()
+  if(InCombatLockdown() or UnitIsDeadOrGhost("player")) then 
+    return 
+  else
+    EquipItemByName(AutoCropDB.normalTrinketID, AutoCropDB.trinketSlot)
+    EquipItemByName(AutoCropDB.normalHelmID, 1)
+    if AutoCropDB.legacy then
+      EquipItemByName(AutoCropDB.normalBootsID, 8)
+      EquipItemByName(AutoCropDB.normalGlovesID, 10)
+    end
+  end
+end
+
+-- Find item IDs that have spurs and riding enchant on them
+function AutoCrop_SearchBootsGloves()
+  AutoCropDB.bootsID = 0
+  AutoCropDB.glovesID = 0
+  for bag = 0, NUM_BAG_SLOTS do
+    for slot = 0, GetContainerNumSlots(bag) do
+      local link = GetContainerItemLink(bag, slot)
+      if(link) then
+        local itemID, enchantID = link:match("item:(%d+):(%d+)")
+        if(enchantID == "930") then -- riding gloves
+          AutoCropDB.glovesID = itemID
+        elseif(enchantID == "464") then -- mithril spurs
+          AutoCropDB.bootsID = itemID
+        end
+      end
+    end
+  end
 end
 
 function AutoCrop_OnLoad()
+  if not AutoCropDB then --
+    AutoCropDB = AutoCropDB_BACKUP
+    AutoCrop_Print("Database reset; please update your settings (e.g. you gas helm item ID).")
+  end
   if AutoCropDB.enabled then
     AutoCropButton.overlay:SetColorTexture(0, 1, 0, 0.3)
   else
@@ -290,108 +132,228 @@ function AutoCrop_OnLoad()
   else
     AutoCropButton:Hide()
   end
+  if AutoCropDB.legacy then
+    AutoCrop_SearchBootsGloves()
+  end
   AutoCropButton:SetScale(AutoCropDB.buttonScale or 1)
 end
 
 -- Slash commands
 local function OnSlash(key, value, ...)
-  if key and key ~= "" then
-    if key == "enabled" then
-      if value == "toggle" or tonumber(value) then
-        local enable
-        if value == "toggle" then
-          enable = not AutoCropDB.enabled
-        else
-          enable = tonumber(value) == 1 and true or false
-        end
-        AutoCropDB.enabled = enable
-        AutoCrop_Print("'enabled' set: "..( enable and "true" or "false" ))
-        if not enable then AutoCrop_EquipNormalSet() end
-          AutoCrop_OnLoad()
-        else
-          AutoCrop_Print("'enabled' = "..( AutoCropDB.enabled and "true" or "false" ))
-        end
-    elseif key == "slot" then
-      if tonumber(value) then
-        local enable = tonumber(value) == 1 and true or false
-        AutoCropDB.trinketSlot = enable
-        AutoCrop_Print("'trinket slot' set: "..( enable and "true" or "false" ))
-      else
-        AutoCrop_Print("'trinket slot' = "..( AutoCropDB.trinketSlot and "true" or "false" ))
-      end
-      elseif key == "legacy" then
-        if tonumber(value) then
-          local enable = tonumber(value) == 1 and true or false
-          AutoCropDB.legacyMode = enable
-          AutoCrop_Print("'legacy mode' set: "..( enable and "true" or "false" ))
-        else
-          AutoCrop_Print("'legacy mode' = "..( AutoCropDB.legacyMode and "true" or "false" ))
-        end
-    elseif key == "gas" then
-      if tonumber(value) then
-        local enable = tonumber(value) == 1 and true or false
-        AutoCropDB.gasHelm = enable
-        AutoCrop_Print("'gas goggles' set: "..( enable and "true" or "false" ))
-      else
-        AutoCrop_Print("'gas goggles' = "..( AutoCropDB.gasHelm and "true" or "false" ))
-      end
-      elseif key == "legacy" then
-        if tonumber(value) then
-          local enable = tonumber(value) == 1 and true or false
-          AutoCropDB.legacyMode = enable
-          AutoCrop_Print("'legacy mode' set: "..( enable and "true" or "false" ))
-        else
-          AutoCrop_Print("'legacy mode' = "..( AutoCropDB.legacyMode and "true" or "false" ))
-        end
-      elseif key == "interval" then
-        if tonumber(value) then
-          local interval = tonumber(value)
-          AutoCropDB.updateInterval = interval
-          AutoCrop_Print("'update interval' set: "..interval)
-        else
-          AutoCrop_Print("'update interval' = "..AutoCropDB.updateInterval)
-        end
-    elseif key == "button" then
-      if tonumber(value) then
-        local enable = tonumber(value) == 1 and true or false
-        AutoCropDB.button = enable
-        AutoCrop_Print("'button' set: "..( enable and "true" or "false" ))
-        AutoCrop_OnLoad()
-      elseif value == "reset" then
-        AutoCropButton:ClearAllPoints()
-        AutoCropButton:SetPoint("CENTER")
-        AutoCropDB.buttonScale = 1
-        AutoCrop_OnLoad()
-        AutoCrop_Print("Button position/scale reset.")
-      elseif value == "scale" then
-        local arg2 = ...
-        if tonumber(arg2) then
-          AutoCropDB.buttonScale = arg2
-          AutoCrop_Print("'buttonScale' set: "..AutoCropDB.buttonScale)
-          AutoCrop_OnLoad()
-        else
-          AutoCrop_Print("'buttonScale' = "..AutoCropDB.buttonScale or 1)
-          AutoCrop_Print("Usage: /autocrop button scale 1.0")
-        end
-      else
-        AutoCrop_Print("'button' = "..( AutoCropDB.button and "true" or "false" ))
-      end
-    elseif key == "reset" then
-      AutoCropDB = nil
-      collectgarbage()
+  if key == "enable" and (value == "toggle" or tonumber(value)) then
+    if value == "toggle" then
+      AutoCropDB.enabled = not AutoCropDB.enabled
+    else
+      AutoCropDB.enabled = tonumber(value) == 1 and true or false
     end
+    if not AutoCropDB.enabled then
+      AutoCrop_EquipNormalSet()
+    elseif AutoCropDB.enabled and IsMounted() then
+      AutoCrop_EquipRidingSet()
+    end
+    AutoCrop_OnLoad()
+    AutoCrop_Print("'enabled' = "..( AutoCropDB.enabled and "true" or "false" ))
+  elseif key == "pvp" and (value == "toggle" or tonumber(value)) then
+    if value == "toggle" then
+      AutoCropDB.pvp = not AutoCropDB.pvp
+    else
+      AutoCropDB.pvp = tonumber(value) == 1 and true or false
+    end
+    if AutoCropDB.pvp then
+      AutoCrop_EquipNormalSet()
+    elseif not AutoCropDB.pvp and IsMounted() then
+      AutoCrop_EquipRidingSet()
+    end
+    AutoCrop_OnLoad()
+    AutoCrop_Print("'pvp' = "..( AutoCropDB.pvp and "true" or "false" ))
+  elseif key == 'legacy' and (value == "toggle" or tonumber(value)) then
+    if value == "toggle" then
+      AutoCropDB.legacy = not AutoCropDB.legacy
+    else
+      AutoCropDB.legacy = tonumber(value) == 1 and true or false
+    end
+    AutoCrop_Print("'legacy' = "..( AutoCropDB.legacy and "true" or "false" ))
+  elseif key == "enabledignored" then
+    if value == "toggle" or tonumber(value) then
+      local enable
+      if value == "toggle" then
+        enable = not AutoCropDB.enabledIgnored
+      else
+        enable = tonumber(value) == 1 and true or false
+      end
+      AutoCropDB.enabledIgnored = enable
+      if AutoCropDB.enabledIgnored and AutoCrop_InArray(string.lower(GetZoneText()), AutoCropDB.ignoredList) then
+        AutoCrop_EquipNormalSet()
+      elseif not AutoCropDB.enabledIgnored and IsMounted() then
+        AutoCrop_EquipRidingSet(false)
+      end
+      AutoCrop_Print("'enabledignored' set: "..( enable and "true" or "false" ))
+    else
+      AutoCrop_Print("'enabled' = "..( AutoCropDB.enabled and "true" or "false" ))
+    end
+  elseif key == "ignoredlist" then
+    if value == 'reset' then
+      AutoCrop_Print("'ignoredlist' has been reset.")
+      AutoCropDB.ignoredList = AutoCropDB_BACKUP.ignoredList
+    elseif value == 'print' and next(AutoCropDB.ignoredList) == nil then
+      AutoCrop_Print("'ignoredlist' is empty.")
+    elseif value == 'print' then
+      AutoCrop_Print("The following instances are currently in the ignored list 'ignoredlist':")
+      AutoCrop_PrintTable(AutoCropDB.ignoredList)
+    else
+      -- Join together instance names that have spaces in them
+      if select('#',...) > 0 then
+        for i = 1,select("#",...) do
+          value = value..' '..select(i,...)
+        end
+      end
+      -- Split based on commas
+      for instance in string.gmatch(value, "[^,]+") do
+        if not AutoCrop_InArray(instance, AutoCropDB.ignoredList) then
+          AutoCrop_Print("Added instance to ignore list: "..instance)
+          table.insert(AutoCropDB.ignoredList, instance)
+        end
+      end
+      if AutoCropDB.enabledIgnored and AutoCrop_InArray(string.lower(GetZoneText()), AutoCropDB.ignoredList) then
+        AutoCrop_EquipNormalSet()
+      end
+    end
+  elseif key == "slot" and (tonumber(value) == 0 or tonumber(value) == 1) then
+    AutoCropDB.tinketSlot = 13+tonumber(value) -- upper trinket slot is index 13
+    AutoCrop_Print("Trinket slot set to: "..value)
+  elseif key == "slot" then
+    AutoCrop_Print("invalid value for 'slot' argument. Must be either 0(upper) or 1(lower); received: "..tostring(value))
+  elseif key == "gas" and AutoCrop_InArray(tonumber(value), AutoCropDB.vaildGasHelmIDs) then
+    AutoCropDB.gasHelmID = tonumber(value)    
+    AutoCrop_Print("Gas helm set to item ID: "..value)
+  elseif key == "gas" then
+    AutoCrop_Print("invalid value for 'gas' argument. Must be valid gas helm item ID number or 0 to disable; received: "..tostring(value))
+  elseif key == "button" then
+    if tonumber(value) then
+      local enable = tonumber(value) == 1 and true or false
+      AutoCropDB.button = enable
+      AutoCrop_Print("'button' set: "..( enable and "true" or "false" ))
+      AutoCrop_OnLoad()
+    elseif value == "reset" then
+      AutoCropButton:ClearAllPoints()
+      AutoCropButton:SetPoint("CENTER")
+      AutoCropDB.buttonScale = 1
+      AutoCrop_OnLoad()
+      AutoCrop_Print("Button position/scale reset.")
+    elseif value == "scale" then
+      local arg2 = ...
+      if tonumber(arg2) then
+        AutoCropDB.buttonScale = arg2
+        AutoCrop_Print("'buttonScale' set: "..AutoCropDB.buttonScale)
+        AutoCrop_OnLoad()
+      else
+        AutoCrop_Print("'buttonScale' = "..AutoCropDB.buttonScale or 1)
+        AutoCrop_Print("Usage: /autocrop button scale 1.0")
+      end
+    else
+      AutoCrop_Print("'button' = "..( AutoCropDB.button and "true" or "false" ))
+    end
+  elseif key == "reset" then
+    AutoCropDB = AutoCropDB_BACKUP
+    AutoCrop_Print("Database has been reset.")
   else
     AutoCrop_Print("Slash commands:")
     AutoCrop_Print("enabled - toggle addon on and off. Values: 0/1/toggle ("..(AutoCropDB.enabled and "1" or "0")..")")
-    AutoCrop_Print("slot - toggle trinket slot you want to use Values: 0(upper)/1(lower) ("..(AutoCropDB.trinketSlot and "1" or "0")..")")
-    AutoCrop_Print("gas - toggle equipping of the engi gas helmet. Values: 0/1 ("..(AutoCropDB.gasHelm and "1" or "0")..")")
-    AutoCrop_Print("legacy - toggle between TBC riding gear and Classic riding gear. Values: 0/1 ("..(AutoCropDB.legacyMode and "1" or "0")..")")
-    AutoCrop_Print("interval - set how often addon should check if gear needs switching. Default value: 0.2 [seconds] ("..AutoCropDB.updateInterval..")")
+    AutoCrop_Print("pvp - toggle addon on and off if in a BG or arena. Values: 0/1/toggle ("..(AutoCropDB.pvp and "1" or "0")..")")
+    AutoCrop_Print("slot - toggle trinket slot you want to use Values: 0(upper)/1(lower) ("..tostring(AutoCropDB.trinketSlot)..")")
+    AutoCrop_Print("gas - item ID number for the engi gas helmet; use 0 to disable  ("..tostring(AutoCropDB.gasHelmID)..")")
     AutoCrop_Print("button - settings of the button. Values: 0/1/reset/scale ("..(AutoCropDB.button and "1" or "0")..")")
     AutoCrop_Print("reset - reset saved settings, please reload ui with /rl command afterwards")
+    AutoCrop_Print("ignoredlist reset/print/comma separated list of instance names to disable AutoCarrot in. Example:\n/ac ignoredlist reset\n/ac ignoredlist print\n/ac ignoredlist Ruins of Ahn'Qiraj,Ahn'Qiraj")
+    AutoCrop_Print("enabledignored 0/1/toggle ("..(AutoCropDB.enabledIgnored and "1" or "0")..")")
     print("|cfffffcfcAuto|cff00ffffCrop|r ver."..AutoCropDB.version.." by |cff00ffffChromie|r-NethergardeKeep")
   end
 end
+
+local f = CreateFrame("Frame")
+  f:RegisterEvent('PLAYER_LOGIN')
+  f:RegisterEvent('BAG_UPDATE')
+  f:RegisterEvent('ADDON_LOADED')
+  f:RegisterEvent('PLAYER_MOUNT_DISPLAY_CHANGED')
+  f:RegisterEvent('CHAT_MSG_CHANNEL_NOTICE') -- Used for knowning when player changed zones; ZONE_CHANGED had issues
+  f:RegisterEvent('PLAYER_REGEN_DISABLED')
+  f:RegisterEvent('PLAYER_REGEN_ENABLED') -- Used for knowing when player leaves combat; PLAYER_LEAVE_COMBAT had issues
+
+f:SetScript("OnEvent", function(self, event, ...)
+  
+  if event == 'ADDON_LOADED' then
+    local addon = ...
+    if addon == 'AutoCrop' then
+      AutoCrop_OnLoad()
+      return
+    end
+  elseif (not AutoCropDB.enabled or UnitIsDeadOrGhost("player") or UnitOnTaxi("player")) then
+    return
+  end
+  
+  -- User wants to ignore chaning for pvp
+  if AutoCropDB.pvp then
+    local inInstance, instanceType = IsInInstance()
+    if instanceType == 'pvp' or instanceType == 'arena' then
+      return
+    end
+  end
+  
+  local inIgnored = AutoCrop_InArray(string.lower(GetZoneText()), AutoCropDB.ignoredList)
+  local isMounted = IsMounted()
+  
+  -- Ignore changing if in a ignored zone
+  if AutoCropDB.enabledIgnored and inIgnored then
+    if not AutoCropDB.insideIgnored then
+      AutoCrop_EquipNormalSet()
+      AutoCropDB.insideIgnored = true
+    end
+    return
+  else
+    AutoCropDB.insideIgnored = false
+    if isMounted then
+      AutoCrop_EquipRidingSet(false)
+    end
+  end
+  
+  -- Changing gear after exiting combat if entered combat while mounted and dismounted
+  if event == 'PLAYER_REGEN_DISABLED' and isMounted then
+    AutoCropDB.enteredCombatMounted = true
+  elseif event == 'PLAYER_REGEN_ENABLED' and not AutoCropDB.changeWhenExit then
+    AutoCropDB.enteredCombatMounted = false
+  elseif event == 'PLAYER_REGEN_ENABLED' and AutoCropDB.changeWhenExit then
+    AutoCrop_EquipNormalSet()
+    AutoCropDB.enteredCombatMounted = false
+    AutoCropDB.changeWhenExit = false
+  end
+  
+  -- player has either changed mount state or changed zones
+  if (event == 'PLAYER_MOUNT_DISPLAY_CHANGED' or event == 'CHAT_MSG_CHANNEL_NOTICE') then
+    local inGasZone = AutoCrop_InArray(GetZoneText(), AutoCropDB.validGasZones)
+    -- player mounted
+    if isMounted ~= AutoCropDB.previousMountState and isMounted and event == 'PLAYER_MOUNT_DISPLAY_CHANGED' then
+      AutoCrop_EquipRidingSet()
+      AutoCropDB.previousMountState = isMounted
+    -- player dismounted
+    elseif isMounted ~= AutoCropDB.previousMountState and not isMounted and event == 'PLAYER_MOUNT_DISPLAY_CHANGED' then
+      if AutoCropDB.enteredCombatMounted then
+        AutoCropDB.changeWhenExit = true
+      else
+        AutoCrop_EquipNormalSet()
+      end
+      AutoCropDB.previousMountState = isMounted
+    -- player entered a zone with gas clounds
+    elseif isMounted and event == 'CHAT_MSG_CHANNEL_NOTICE' and inGasZone then
+      EquipItemByName(AutoCropDB.gasHelmID, 1)
+    -- player entered a zone without gas clouds
+    elseif isMounted and event == 'CHAT_MSG_CHANNEL_NOTICE' and not inGasZone then
+      EquipItemByName(AutoCropDB.normalHelmID, 1)
+    end
+  -- item added to bags; check for legacy items
+  elseif AutoCropDB.legacy and event == 'BAG_UPDATE' then
+    AutoCrop_SearchBootsGloves()
+  end
+end)
 
 SLASH_AUTOCROP1 = "/autocrop";
 SLASH_AUTOCROP2 = "/ac";
